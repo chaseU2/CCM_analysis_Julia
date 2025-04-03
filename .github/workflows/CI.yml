@@ -1,0 +1,24 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        version: ['1.6', '1.8', '1.9']
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.version }}
+      
+      - name: "Install dependencies"
+        run: julia --project=@. -e 'using Pkg; Pkg.instantiate()'
+      
+      - name: "Run tests"
+        run: julia --project=@. -e 'using Pkg; Pkg.test()'
