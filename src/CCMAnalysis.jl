@@ -1,4 +1,4 @@
-module CCMAnalysis
+module CCM_analysis_Julia
 
 using DelimitedFiles
 using DataFrames
