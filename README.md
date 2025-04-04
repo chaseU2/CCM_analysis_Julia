@@ -11,7 +11,11 @@ Pkg.add(url="https://github.com/chaseU2/CCM_analysis_Julia.git")
 
 # Activate the package
 using CCMAnalysis
+```
 
+## How to call the funktion:
+
+```julia
 # Run CCM analysis with comprehensive parameters
 results = run_ccm_analysis(
     "path/to/your/data.tsv",  # Tab/CSV file (columns = variables, rows = timepoints)
