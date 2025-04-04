@@ -1,4 +1,4 @@
-name = "CCMAnalysis"
+name = "CCM_analysis_Julia"
 uuid = "2d4db21e-b325-4375-9406-ee7a0d29fe22"
 authors = ["Karl Balzer <klbalzer@web.de>"]
 version = "0.1.0"
