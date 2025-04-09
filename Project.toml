@@ -1,7 +1,7 @@
 name = "CCM_analysis_Julia"
 uuid = "2d4db21e-b325-4375-9406-ee7a0d29fe22"
 authors = ["Karl Balzer <klbalzer@web.de>"]
-version = "0.1.0"
+version = "1.3.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
