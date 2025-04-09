@@ -1,5 +1,3 @@
-using DataFrames, LinearAlgebra, Statistics, DelimitedFiles, Plots, Dates, Distances
-
 function run_ccm_analysis(
     input_data;
     L=110,
@@ -81,7 +79,7 @@ function run_ccm_analysis(
         return distance_metrics, steps
     end
 
-    # Helper function to find nearest neighbors
+    # Helper function to find nearest neighbors (more robust version)
     function nearest_dist_and_step(timepoint_oi, steps, dist_matr, E)
         index_timepoint = findfirst(==(timepoint_oi), steps)
         if index_timepoint === nothing
@@ -89,14 +87,18 @@ function run_ccm_analysis(
         end
         
         dist_timepoint = @view dist_matr[index_timepoint, :]
+        
+        # Find all valid indices (excluding self and NaN distances)
         valid_indices = [i for i in 1:length(dist_timepoint) if i != index_timepoint && !isnan(dist_timepoint[i])]
         
         if length(valid_indices) < E
             return Int[], Float64[]
         end
         
+        # Get indices of E nearest neighbors
         partial_sort_order = partialsortperm(dist_timepoint[valid_indices], 1:E, rev=false)
         nearest_indis = valid_indices[partial_sort_order]
+        
         nearest_timesteps = steps[nearest_indis]
         nearest_distances = dist_timepoint[nearest_indis]
         
@@ -146,27 +148,6 @@ function run_ccm_analysis(
         r = cor(X_true_list, X_hat_list)
         p = isnan(r) ? 1.0 : 0.0
         return isnan(r) ? 0.0 : r, p
-    end
-
-    # Robust user input function
-    function get_user_decision(species1, species2)
-        valid_choices = ["0", "1", "2", "3"]
-        
-        while true
-            print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
-            flush(stdout)
-            
-            try
-                decision = strip(readline())
-                if decision in valid_choices
-                    return decision
-                else
-                    println("Invalid input! Please enter 0-3")
-                end
-            catch e
-                println("\nError reading input. Please try again.")
-            end
-        end
     end
 
     # Load and prepare data
@@ -257,8 +238,16 @@ function run_ccm_analysis(
                 println("\nAnalyzing: $species1 ↔ $species2")
                 println("Final ρ: $species1→$species2: $(round(x_to_y[end], digits=2)), $species2→$species1: $(round(y_to_x[end], digits=2))")
                     
-                # Get user input using robust function
-                decision = get_user_decision(species1, species2)
+                # Get user input
+                decision = "0"
+                while true
+                    print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
+                    decision = readline()
+                    if decision in ["0", "1", "2", "3"]
+                        break
+                    end
+                    println("Invalid input! Please enter 0-3")
+                end
                 
                 if save_plots
                     plot_path = joinpath(output_dir, "convergence_$(species1)_vs_$(species2).png")
@@ -278,7 +267,7 @@ function run_ccm_analysis(
                 write(protocol, "Decision: $decision\n")
             end
             
-            # Create final results
+            # Create final results without heatmap
             if !isempty(convergence_results)
                 significant_species = unique(vcat(convergence_results.Species_X, convergence_results.Species_Y))
                 sort!(significant_species)
@@ -365,8 +354,16 @@ function run_ccm_analysis(
             println("\nAnalyzing: $species1 ↔ $species2")
             println("Final ρ: $species1→$species2: $(round(x_to_y[end], digits=2)), $species2→$species1: $(round(y_to_x[end], digits=2))")
                 
-            # Get user input using robust function
-            decision = get_user_decision(species1, species2)
+            # Get user input
+            decision = "0"
+            while true
+                print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
+                decision = readline()
+                if decision in ["0", "1", "2", "3"]
+                    break
+                end
+                println("Invalid input! Please enter 0-3")
+            end
             
             if save_plots
                 plot_path = joinpath(output_dir, "convergence_$(species1)_vs_$(species2).png")
@@ -382,7 +379,7 @@ function run_ccm_analysis(
             end
         end
         
-        # Create final results
+        # Create final results without heatmap
         if !isempty(convergence_results)
             significant_species = unique(vcat(convergence_results.Species_X, convergence_results.Species_Y))
             sort!(significant_species)
