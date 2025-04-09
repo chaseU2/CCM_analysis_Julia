@@ -1,3 +1,5 @@
+using DataFrames, LinearAlgebra, Statistics, DelimitedFiles, Plots, Dates, Distances
+
 function run_ccm_analysis(
     input_data;
     L=110,
@@ -150,6 +152,39 @@ function run_ccm_analysis(
         return isnan(r) ? 0.0 : r, p
     end
 
+    # Robust user input function
+    function get_user_decision(species1, species2)
+        valid_choices = ["0", "1", "2", "3"]
+        decision = ""
+        
+        # Clear any pending input
+        while bytesavailable(stdin) > 0
+            read(stdin, Char)
+        end
+        
+        while true
+            print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
+            flush(stdout)
+            
+            # Read input character by character until newline
+            decision = ""
+            while true
+                c = read(stdin, Char)
+                if c == '\n'
+                    break
+                end
+                decision *= c
+            end
+            
+            decision = strip(decision)
+            if decision in valid_choices
+                return decision
+            else
+                println("Invalid input! Please enter 0-3")
+            end
+        end
+    end
+
     # Load and prepare data
     if input_data isa String
         ccm_data_matrix = readdlm(input_data, '\t', header=true)
@@ -238,16 +273,8 @@ function run_ccm_analysis(
                 println("\nAnalyzing: $species1 ↔ $species2")
                 println("Final ρ: $species1→$species2: $(round(x_to_y[end], digits=2)), $species2→$species1: $(round(y_to_x[end], digits=2))")
                     
-                # Get user input
-                decision = "0"
-                while true
-                    print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
-                    decision = readline()
-                    if decision in ["0", "1", "2", "3"]
-                        break
-                    end
-                    println("Invalid input! Please enter 0-3")
-                end
+                # Get user input using robust function
+                decision = get_user_decision(species1, species2)
                 
                 if save_plots
                     plot_path = joinpath(output_dir, "convergence_$(species1)_vs_$(species2).png")
@@ -354,16 +381,8 @@ function run_ccm_analysis(
             println("\nAnalyzing: $species1 ↔ $species2")
             println("Final ρ: $species1→$species2: $(round(x_to_y[end], digits=2)), $species2→$species1: $(round(y_to_x[end], digits=2))")
                 
-            # Get user input
-            decision = "0"
-            while true
-                print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
-                decision = readline()
-                if decision in ["0", "1", "2", "3"]
-                    break
-                end
-                println("Invalid input! Please enter 0-3")
-            end
+            # Get user input using robust function
+            decision = get_user_decision(species1, species2)
             
             if save_plots
                 plot_path = joinpath(output_dir, "convergence_$(species1)_vs_$(species2).png")
