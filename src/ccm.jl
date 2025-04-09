@@ -6,42 +6,36 @@ using DelimitedFiles
 using Plots
 using Distances
 
-function safe_prompt(prompt_msg::String, options::Vector{String}=String[]; default::String="")
+function robust_prompt(prompt_msg::String, options::Vector{String}=String[]; default::String="")
     """
-    Robust input handling for both REPL and script execution
+    Eingabefunktion die zuverlässig in REPL und Skripten funktioniert
     """
-    # Try the interactive prompt first
-    try
-        response = Base.prompt(prompt_msg; default=default)
-        response = strip(response)
-        
-        if !isempty(options)
-            while response ∉ options
-                println("Invalid input! Valid options: ", join(options, ", "))
-                response = strip(Base.prompt(prompt_msg; default=default))
+    # Puffer leeren falls interaktiv
+    if isinteractive()
+        while Base.pending_stdin()
+            readavailable(stdin)
+        end
+    end
+    
+    while true
+        try
+            print(prompt_msg)
+            response = strip(readline())
+            
+            # Default-Wert bei leerer Eingabe
+            if isempty(response) && !isempty(default)
+                return default
             end
-        end
-        return response
-    catch ex
-        # Fallback to standard input
-        println(prompt_msg)
-        if !isempty(default)
-            println("(Press Enter for default: $default)")
-        end
-        response = strip(readline())
-        
-        if isempty(response) && !isempty(default)
-            return default
-        end
-        
-        if !isempty(options)
-            while response ∉ options
-                println("Invalid input! Valid options: ", join(options, ", "))
-                println(prompt_msg)
-                response = strip(readline())
+            
+            # Optionen validieren falls angegeben
+            if isempty(options) || response ∈ options
+                return response
+            else
+                println("Ungültige Eingabe! Erlaubte Optionen: ", join(options, ", "))
             end
+        catch e
+            println("Eingabefehler - bitte versuchen Sie es erneut")
         end
-        return response
     end
 end
 
@@ -56,7 +50,7 @@ function run_ccm_analysis(
     output_dir=nothing,
     show_plots=true
 )
-    # Create output directory if needed
+    # Ausgabeverzeichnis erstellen
     if (save_plots || save_protocol) && output_dir === nothing
         output_dir = "ccm_results_" * Dates.format(now(), "yyyymmdd_HHMMSS")
     end
@@ -65,7 +59,7 @@ function run_ccm_analysis(
         mkpath(output_dir)
     end
 
-    # Shadow manifold construction
+    # Shadow manifold Konstruktion
     function shadow_manifold(time_series_Y, L, E, tau)
         shadow_M = Dict{Int, Vector{Float64}}()
         max_t = min(L-1, length(time_series_Y)-1)
@@ -84,7 +78,7 @@ function run_ccm_analysis(
         return shadow_M
     end
 
-    # Distance matrix calculation
+    # Distanzmatrix Berechnung
     function vec_dist_matrx(shadow_M)
         steps = Int[]
         vecs = Vector{Float64}[]
@@ -96,7 +90,7 @@ function run_ccm_analysis(
         return distance_metrics, steps
     end
 
-    # Nearest neighbors finding
+    # Nächste Nachbarn finden
     function nearest_dist_and_step(timepoint_oi, steps, dist_matr, E)
         index_timepoint = findfirst(==(timepoint_oi), steps)
         if index_timepoint === nothing
@@ -119,7 +113,7 @@ function run_ccm_analysis(
         return nearest_timesteps, nearest_distances
     end
 
-    # Prediction function
+    # Vorhersagefunktion
     function prediction(timepoint_oi, time_series_X, shadow_m, E)
         dist_matrix, steps = vec_dist_matrx(shadow_m)
         non_zero = 0.000001
@@ -137,7 +131,7 @@ function run_ccm_analysis(
         return X_true, X_hat
     end
 
-    # Causality calculation
+    # Kausalitätsberechnung
     function find_causality(time_series_X, time_series_Y, L, E, tau)
         My = shadow_manifold(time_series_Y, L, E, tau)
         X_true_list = Float64[]
@@ -164,7 +158,7 @@ function run_ccm_analysis(
         return isnan(r) ? 0.0 : r, p
     end
 
-    # Data loading
+    # Daten laden
     if input_data isa String
         ccm_data_matrix = readdlm(input_data, '\t', header=true)
         header = string.(ccm_data_matrix[2][1, :])
@@ -174,25 +168,25 @@ function run_ccm_analysis(
     elseif input_data isa DataFrame
         ccm_data = deepcopy(input_data)
     else
-        error("input_data must be either a file path (String) or a DataFrame")
+        error("input_data muss entweder ein Dateipfad (String) oder ein DataFrame sein")
     end
     
     actual_L = min(L, size(ccm_data, 1))
     species_names = names(ccm_data)
     
-    # Initialize results
+    # Ergebnisse initialisieren
     results_df = DataFrame(zeros(length(species_names), length(species_names)), :auto)
     rename!(results_df, species_names)
     results_df[!, :Species] = species_names
     results_df = results_df[:, [:Species; Symbol.(species_names)]]
 
-    # Calculate initial CCM matrix
+    # Initiale CCM-Matrix berechnen
     for (i, species1) in enumerate(species_names), (j, species2) in enumerate(species_names)
         r, p = find_causality(ccm_data[!, species1], ccm_data[!, species2], actual_L, E, tau)
         results_df[i, j+1] = max(0, round(r, digits=4))
     end
 
-    # Convergence analysis
+    # Konvergenzanalyse
     L_range = 5:5:actual_L-1
     convergence_results = DataFrame(Species_X=String[], Species_Y=String[], X_to_Y_ρ=Float64[], Y_to_X_ρ=Float64[])
     analyzed_pairs = Set{Tuple{String, String}}()
@@ -206,11 +200,11 @@ function run_ccm_analysis(
 
         push!(analyzed_pairs, (species1, species2), (species2, species1))
         
-        # Calculate convergence
+        # Konvergenz berechnen
         x_to_y = [find_causality(ccm_data[!, species1], ccm_data[!, species2], L_val, E, tau)[1] for L_val in L_range]
         y_to_x = [find_causality(ccm_data[!, species2], ccm_data[!, species1], L_val, E, tau)[1] for L_val in L_range]
         
-        # Plotting
+        # Plot erstellen
         plt = plot(L_range, x_to_y, label="$species1 → $species2", color=:blue, marker=:circle)
         plot!(plt, L_range, y_to_x, label="$species2 → $species1", color=:red, marker=:square)
         xlabel!(plt, "Library Size (L)")
@@ -221,16 +215,16 @@ function run_ccm_analysis(
         show_plots && display(plt)
         save_plots && !isnothing(output_dir) && savefig(plt, joinpath(output_dir, "convergence_$(species1)_vs_$(species2).png"))
 
-        # User decision with robust input
-        decision = safe_prompt("""
-        Convergence for $species1 ↔ $species2?
-        1 = both directions
-        2 = $species1→$species2 only
-        3 = $species2→$species1 only
-        0 = none
-        Enter choice (0-3):""", ["0", "1", "2", "3"])
+        # Benutzerentscheidung mit robuster Eingabe
+        decision = robust_prompt("""
+        Konvergenz für $species1 ↔ $species2?
+        1 = beide Richtungen
+        2 = nur $species1→$species2
+        3 = nur $species2→$species1
+        0 = keine
+        Eingabe (0-3): """, ["0", "1", "2", "3"])
 
-        # Store results based on decision
+        # Ergebnisse speichern basierend auf Entscheidung
         if decision == "1"
             push!(convergence_results, (species1, species2, x_to_y[end], y_to_x[end]))
         elseif decision == "2"
@@ -240,7 +234,7 @@ function run_ccm_analysis(
         end
     end
 
-    # Generate final results
+    # Endergebnisse generieren
     final_matrix = if !isempty(convergence_results)
         sig_species = unique(vcat(convergence_results.Species_X, convergence_results.Species_Y))
         sort!(sig_species)
@@ -263,14 +257,14 @@ function run_ccm_analysis(
         DataFrame()
     end
 
-    # Save protocol if requested
+    # Protokoll speichern falls gewünscht
     if save_protocol && !isnothing(output_dir)
         protocol_path = joinpath(output_dir, "protocol.txt")
         open(protocol_path, "w") do io
-            write(io, "CCM Analysis Protocol - $(now())\n\n")
-            write(io, "Parameters:\n")
-            write(io, "- L: $actual_L\n- E: $E\n- tau: $tau\n- Threshold: $THRESHOLD\n\n")
-            write(io, "Significant Interactions:\n")
+            write(io, "CCM Analyseprotokoll - $(now())\n\n")
+            write(io, "Parameter:\n")
+            write(io, "- L: $actual_L\n- E: $E\n- tau: $tau\n- Schwellwert: $THRESHOLD\n\n")
+            write(io, "Signifikante Interaktionen:\n")
             
             if !isempty(convergence_results)
                 for row in eachrow(convergence_results)
@@ -279,7 +273,7 @@ function run_ccm_analysis(
                     write(io, "Y→X ρ=$(round(row.Y_to_X_ρ, digits=3))\n")
                 end
             else
-                write(io, "No significant interactions found above threshold\n")
+                write(io, "Keine signifikanten Interaktionen oberhalb des Schwellwerts gefunden\n")
             end
         end
     end
