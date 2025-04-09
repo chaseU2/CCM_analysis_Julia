@@ -81,7 +81,7 @@ function run_ccm_analysis(
         return distance_metrics, steps
     end
 
-    # Helper function to find nearest neighbors (more robust version)
+    # Helper function to find nearest neighbors
     function nearest_dist_and_step(timepoint_oi, steps, dist_matr, E)
         index_timepoint = findfirst(==(timepoint_oi), steps)
         if index_timepoint === nothing
@@ -89,18 +89,14 @@ function run_ccm_analysis(
         end
         
         dist_timepoint = @view dist_matr[index_timepoint, :]
-        
-        # Find all valid indices (excluding self and NaN distances)
         valid_indices = [i for i in 1:length(dist_timepoint) if i != index_timepoint && !isnan(dist_timepoint[i])]
         
         if length(valid_indices) < E
             return Int[], Float64[]
         end
         
-        # Get indices of E nearest neighbors
         partial_sort_order = partialsortperm(dist_timepoint[valid_indices], 1:E, rev=false)
         nearest_indis = valid_indices[partial_sort_order]
-        
         nearest_timesteps = steps[nearest_indis]
         nearest_distances = dist_timepoint[nearest_indis]
         
@@ -155,32 +151,20 @@ function run_ccm_analysis(
     # Robust user input function
     function get_user_decision(species1, species2)
         valid_choices = ["0", "1", "2", "3"]
-        decision = ""
-        
-        # Clear any pending input
-        while bytesavailable(stdin) > 0
-            read(stdin, Char)
-        end
         
         while true
             print("Convergence in? (1=both, 2=$species1→$species2 only, 3=$species2→$species1 only, 0=none): ")
             flush(stdout)
             
-            # Read input character by character until newline
-            decision = ""
-            while true
-                c = read(stdin, Char)
-                if c == '\n'
-                    break
+            try
+                decision = strip(readline())
+                if decision in valid_choices
+                    return decision
+                else
+                    println("Invalid input! Please enter 0-3")
                 end
-                decision *= c
-            end
-            
-            decision = strip(decision)
-            if decision in valid_choices
-                return decision
-            else
-                println("Invalid input! Please enter 0-3")
+            catch e
+                println("\nError reading input. Please try again.")
             end
         end
     end
@@ -294,7 +278,7 @@ function run_ccm_analysis(
                 write(protocol, "Decision: $decision\n")
             end
             
-            # Create final results without heatmap
+            # Create final results
             if !isempty(convergence_results)
                 significant_species = unique(vcat(convergence_results.Species_X, convergence_results.Species_Y))
                 sort!(significant_species)
@@ -398,7 +382,7 @@ function run_ccm_analysis(
             end
         end
         
-        # Create final results without heatmap
+        # Create final results
         if !isempty(convergence_results)
             significant_species = unique(vcat(convergence_results.Species_X, convergence_results.Species_Y))
             sort!(significant_species)
