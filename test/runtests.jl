@@ -1,8 +1,6 @@
-using CCMAnalysis
+using CCM_analysis_Julia
 using Test
 
-using CCMAnalysis
-using Test
 using DataFrames
 using DelimitedFiles
 
