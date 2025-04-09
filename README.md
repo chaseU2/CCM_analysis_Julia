@@ -10,7 +10,7 @@ using Pkg
 Pkg.add(url="https://github.com/chaseU2/CCM_analysis_Julia.git")
 
 # Activate the package
-using CCMAnalysis
+using CCM_analysis_Julia
 ```
 
 ## How to call the funktion:
