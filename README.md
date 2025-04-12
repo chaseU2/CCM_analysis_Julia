@@ -30,6 +30,7 @@ results = run_ccm_analysis(
 )
 ```
 
+---
 
 ### User-Provided Data
 
@@ -37,7 +38,7 @@ If you want to use your own data for testing or analysis, please ensure that you
 
 You can upload your data file in the same format, with columns and rows matching the original data structure.
 
-
+---
 
 ## Interpreting Convergence Plots
 
@@ -70,6 +71,7 @@ This ensures proper input handling.
 | 3   | Keep only B→A           |
 | 0   | Discard both            |
 
+---
 
 ### 1. No Significant Causality
 
@@ -77,6 +79,8 @@ This ensures proper input handling.
 
 - Neither directional curve (X→Y in blue, Y→X in red) show a clear convergence to a final crossmap score
 - Example use case: Independent systems
+
+---
 
 ### 2. Unidirectional Causality
 ![Unidirectional Causality](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%204.png)
@@ -86,6 +90,8 @@ This ensures proper input handling.
 - Interpretation: X drives Y but not vice versa
 - Pay attention to whether convergence is present in the X→Y or Y→X plot, and enter 2 or 3 accordingly
 
+---
+
 ### 3. Bidirectional Causality
 ![Bidirectional Causality](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%202.png)
 
@@ -93,20 +99,7 @@ This ensures proper input handling.
 - Typical of feedback systems
 - Convergence rates may differ (e.g., X→Y stronger than Y→X)
 
----
 
-## Generating and Customizing Plots
-
-### Basic Plot Generation
-```julia
-results = run_ccm_analysis(
-    your_dataframe,
-    save_plots = true,       # Required to save images
-    output_dir = "analysis",  # Custom folder name
-    show_plots = true,       # Interactive display
-    plot_theme = :default    # :dark, :ggplot2, etc.
-)
-```
 ---
 
 ## Dependencies and Acknowledgements
