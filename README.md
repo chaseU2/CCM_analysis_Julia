@@ -39,6 +39,35 @@ You can upload your data file in the same format, with columns and rows matching
 
 
 
+## Interpreting Convergence Plots
+
+The package generates diagnostic convergence plots that reveal causal relationships between variables. Below are the three characteristic patterns to analyze:
+
+### 1. No Significant Causality
+![No Causal Relationship](https://raw.githubusercontent.com/username/repo/main/docs/src/assets/no_causality.png)
+
+**Key Features**:
+- Both directional curves (X→Y in blue, Y→X in red) remain flat
+- Neither variable shows predictive skill (ρ < 0.2 typically)
+- Example use case: Independent systems
+
+### 2. Unidirectional Causality
+![Unidirectional Causality](https://raw.githubusercontent.com/username/repo/main/docs/src/assets/unidirectional.png)
+
+**Identification**:
+- One direction (X→Y) converges to high ρ (> 0.8)
+- Reverse direction (Y→X) remains near zero
+- Interpretation: X drives Y but not vice versa
+
+### 3. Bidirectional Causality
+![Bidirectional Causality](https://raw.githubusercontent.com/username/repo/main/docs/src/assets/bidirectional.png)
+
+**Characteristics**:
+- Both directions show positive convergence
+- Typical of feedback systems
+- Convergence rates may differ (e.g., X→Y stronger than Y→X)
+
+
 
 ## Dependencies and Acknowledgements
 
