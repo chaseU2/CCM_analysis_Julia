@@ -1,6 +1,6 @@
 # CCMAnalysis.jl
 
-Convergent Cross Mapping (CCM) analysis package for causal inference in time series data.
+Package implementing Convergent Cross Mapping for causality inference in dynamical systems as defined by ["Sugihara et al (2012)"](https://www.science.org/doi/10.1126/science.1227079).
 
 ## Installation
 
