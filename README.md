@@ -43,25 +43,52 @@ You can upload your data file in the same format, with columns and rows matching
 
 The package generates diagnostic convergence plots that reveal causal relationships between variables. Below are the three characteristic patterns to analyze:
 
+
+When analyzing convergence plots, you'll be prompted:
+
+```julia
+Analyzing: SpeciesA ↔ SpeciesB
+Final ρ: SpeciesA→SpeciesB: 0.82, SpeciesB→SpeciesA: 0.41
+
+Convergence in? (1=both, 2=A→B only, 3=B→A only, 0=none): 
+```
+
+### ⚠️ Input Instructions
+If the console doesn't respond to your first number:
+1. Press **Enter** to submit
+2. Type the number **again**
+3. Press **Enter** again
+
+This ensures proper input handling.
+
+### Options Table
+| Key | Action                  |
+|-----|-------------------------|
+| 1   | Keep both directions    |
+| 2   | Keep only A→B           |
+| 3   | Keep only B→A           |
+| 0   | Discard both            |
+
+
 ### 1. No Significant Causality
 
-![Beschreibung des Screenshots](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%202.png)
+![No Causal Relationship](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%205.png)
 
 **Key Features**:
-- Both directional curves (X→Y in blue, Y→X in red) remain flat
-- Neither variable shows predictive skill (ρ < 0.2 typically)
+- Neither directional curve (X→Y in blue, Y→X in red) show a clear convergence to a final crossmap score
 - Example use case: Independent systems
 
 ### 2. Unidirectional Causality
-![Unidirectional Causality](https://raw.githubusercontent.com/username/repo/main/docs/src/assets/unidirectional.png)
+![Unidirectional Causality](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%204.png)
 
 **Identification**:
-- One direction (X→Y) converges to high ρ (> 0.8)
-- Reverse direction (Y→X) remains near zero
+- One direction (X→Y) converges to a final crossmap score
+- Reverse direction (Y→X) does ot show a clear convegence
 - Interpretation: X drives Y but not vice versa
+- Pay attention to whether convergence is present in the X→Y or Y→X plot, and enter 2 or 3 accordingly
 
 ### 3. Bidirectional Causality
-![Bidirectional Causality](https://raw.githubusercontent.com/username/repo/main/docs/src/assets/bidirectional.png)
+![Bidirectional Causality](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%202.png)
 
 **Characteristics**:
 - Both directions show positive convergence
