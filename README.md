@@ -47,11 +47,12 @@ The package generates diagnostic convergence plots that reveal causal relationsh
 When analyzing convergence plots, you'll be prompted:
 
 ```julia
-Analyzing: SpeciesA ↔ SpeciesB
-Final ρ: SpeciesA→SpeciesB: 0.82, SpeciesB→SpeciesA: 0.41
+Analyzing: A ↔ B
+Final ρ: A→B: 0.82, B→A: 0.41
 
 Convergence in? (1=both, 2=A→B only, 3=B→A only, 0=none): 
 ```
+p is in this case the calculated crossmap score 
 
 ### ⚠️ Input Instructions
 If the console doesn't respond to your first number:
@@ -74,14 +75,12 @@ This ensures proper input handling.
 
 ![No Causal Relationship](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%205.png)
 
-**Key Features**:
 - Neither directional curve (X→Y in blue, Y→X in red) show a clear convergence to a final crossmap score
 - Example use case: Independent systems
 
 ### 2. Unidirectional Causality
 ![Unidirectional Causality](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%204.png)
 
-**Identification**:
 - One direction (X→Y) converges to a final crossmap score
 - Reverse direction (Y→X) does ot show a clear convegence
 - Interpretation: X drives Y but not vice versa
@@ -90,7 +89,6 @@ This ensures proper input handling.
 ### 3. Bidirectional Causality
 ![Bidirectional Causality](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%202.png)
 
-**Characteristics**:
 - Both directions show positive convergence
 - Typical of feedback systems
 - Convergence rates may differ (e.g., X→Y stronger than Y→X)
