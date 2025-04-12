@@ -45,7 +45,7 @@ The package generates diagnostic convergence plots that reveal causal relationsh
 
 ### 1. No Significant Causality
 
-![No Causal Relationship](https://raw.[githubusercontent.com/username/repo/main/docs/src/assets/no_causality.png](https://github.com/chaseU2/CCM_analysis_Julia/blob/main/src/Screenshot%202.png))
+![Beschreibung des Screenshots](https://raw.githubusercontent.com/chaseU2/CCM_analysis_Julia/main/src/Screenshot%202.png)
 
 **Key Features**:
 - Both directional curves (X→Y in blue, Y→X in red) remain flat
