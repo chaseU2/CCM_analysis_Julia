@@ -55,13 +55,8 @@ Convergence in? (1=both, 2=A→B only, 3=B→A only, 0=none):
 ```
 p is in this case the calculated crossmap score 
 
-### ⚠️ Input Instructions
-If the console doesn't respond to your first number:
-1. Press **Enter** to submit
-2. Type the number **again**
-3. Press **Enter** again
-
-This ensures proper input handling.
+Here you have to take a look at the shown plot and decide in which directions you can see a convergence of the crossmap skill with increasing library size.
+You have to enter a number according to this table:
 
 ### Options Table
 | Key | Action                  |
@@ -70,6 +65,17 @@ This ensures proper input handling.
 | 2   | Keep only A→B           |
 | 3   | Keep only B→A           |
 | 0   | Discard both            |
+
+This ensures proper input handling.
+
+---
+
+### ⚠️ Input Instructions
+If the console doesn't respond to your first number:
+1. Press **Enter** to submit
+2. Type the number **again**
+3. Press **Enter** again
+
 
 ---
 
