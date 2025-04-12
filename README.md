@@ -93,7 +93,21 @@ This ensures proper input handling.
 - Typical of feedback systems
 - Convergence rates may differ (e.g., X→Y stronger than Y→X)
 
+---
 
+## Generating and Customizing Plots
+
+### Basic Plot Generation
+```julia
+results = run_ccm_analysis(
+    your_dataframe,
+    save_plots = true,       # Required to save images
+    output_dir = "analysis",  # Custom folder name
+    show_plots = true,       # Interactive display
+    plot_theme = :default    # :dark, :ggplot2, etc.
+)
+```
+---
 
 ## Dependencies and Acknowledgements
 
