@@ -44,7 +44,8 @@ You can upload your data file in the same format, with columns and rows matching
 The package generates diagnostic convergence plots that reveal causal relationships between variables. Below are the three characteristic patterns to analyze:
 
 ### 1. No Significant Causality
-![No Causal Relationship](https://raw.githubusercontent.com/username/repo/main/docs/src/assets/no_causality.png)
+
+![No Causal Relationship](https://raw.[githubusercontent.com/username/repo/main/docs/src/assets/no_causality.png](https://github.com/chaseU2/CCM_analysis_Julia/blob/main/src/Screenshot%202.png))
 
 **Key Features**:
 - Both directional curves (X→Y in blue, Y→X in red) remain flat
